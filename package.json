@@ -1,0 +1,21 @@
+{
+  "name": "tago-analysis-scheduler",
+  "version": "1.0.0",
+  "description": "Scheduler of events for Tago",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "scheduler",
+    "tago"
+  ],
+  "author": "Tago LLC",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.13.1",
+    "co": "^4.6.0",
+    "json-2-csv": "^2.0.22",
+    "tago": "^2.0.14"
+  }
+}
