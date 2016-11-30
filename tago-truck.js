@@ -36,8 +36,6 @@ function convert_to_json(data_csv) {
 
 function transform_loc(location) {
     return new Promise((resolve, reject) => {
-        if (!location || location === '') return resolve(null);
-        
         location = location.split(";");
         if (location.length < 2) return reject("Invalid Location");
         try {
@@ -49,11 +47,6 @@ function transform_loc(location) {
     });
 }
 
-/**
- * Create a scheduler based in a URL from GoogleDrive or another source.
- * Reserverd variables: email, email_msg, color, location, reset_here and time.
- * @param  {object} context - from tago
- */
 function run_scheduler(context) {
     context.log("Running script");
 
@@ -69,32 +62,51 @@ function run_scheduler(context) {
         if (!request.data && typeof request.data !== "string") return context.log("Can't access the URL");
 
         const data_list = yield convert_to_json(request.data);
-        if (!data_list || !data_list[0]) return context.log("Tago can't get the excel archive by the URL. Something wrong happens");
-
         let stepnow = yield mydevice.find({"variable": "stepnow", "query": "last_value"});
-        stepnow = stepnow[0] ? stepnow[0].value : 0;
+        stepnow = stepnow[0] ? Number(stepnow[0].value) : 0;
 
         const data     = data_list[stepnow] ? data_list[stepnow]: data_list[0];
         const serie    = new Date().getTime();
         const location = yield transform_loc(data.location);
         const color    = data.color;
-        const reset    = data.reset_here;
         let time;
 
-        function send_email() {
+        function send_email(email_msg) {
             context.log('Sending email...');
-            const email_service = new Service(context.token).email;
-            email_service.send(data.email, 'Tago Scheduler', data.email_msg);
+            co(function*() {
+                const email_service = new Service(context.token).email;
+                let email_list = yield mydevice.find({"variable":"email_list", qty:30});
+                email_list = email_list.reduce((previous, email_var) => {
+                    if (email_var.value in previous.emails) return;
+
+                    previous.emails.push(email_var.value);
+                    previous.ids.push(email_var.id);
+
+                    return previous;
+                }, { "emails": [], "ids": [] });
+
+                email_list.emails.forEach((email, i) => {
+                    console.log(stepnow, Number(env_var.reset_at_step), email_list.ids[i], email_msg);
+                    email_service.send(email, 'Truck Report', email_msg);
+
+                    /** 
+                     * Remove email from bucket if index return to 0
+                     * Can change this rule later
+                     */
+                    if (stepnow === Number(env_var.reset_at_step)) mydevice.remove(email_list.ids[i]);
+                });
+            }).catch(context.log);
         }
 
-        if (data.email_msg && data.email_msg !== '' && data.email) send_email();
-        ["time","color","email_msg","email","reset_here"].forEach((x) => delete data[x]);
-
+        if (data.email_msg && data.email_msg !== '') send_email(data.email_msg); 
+        else data.email_msg = '-';
+        ["time","color"].forEach((x) => delete data[x]);
+        
         function format_var(variable, value) {
             let data_to_insert = {
                 "variable": variable,
-                "value":value, 
-                "serie":serie
+                "value": value, 
+                "serie": serie
             };
 
             if (time) data_to_insert.time = time;
@@ -109,23 +121,20 @@ function run_scheduler(context) {
             data_to_insert.push(format_var(key, data[key]));
         });
 
+        const new_stepnow = data_list[stepnow+1] ? stepnow+1 : 0;
         data_to_insert.push({
             "variable": "stepnow",
-            "value": data_list[stepnow+1] ? stepnow+1 : 0,
+            "value": String(new_stepnow),
             serie
         });
+        console.log(new_stepnow);
 
-        if (reset) {
-            const remove_all = data_to_insert.map(x => mydevice.remove(x.variable ,'all'));
-            const result = yield Promise.all(remove_all);
-            context.log("Data Removed", result);
-        }
-
-        yield mydevice.insert(data_to_insert);
+        if (new_stepnow === 0) data_to_insert.forEach(myvar => mydevice.remove(myvar.variable, 'all').then(() => mydevice.insert(data_to_insert)));
+        else yield mydevice.insert(data_to_insert);
         context.log("Succesfully Inserted schedule data");
     }).catch(context.log);
 
 }
 
-module.exports = new Analysis(run_scheduler, '933386e0-6660-11e6-b31b-3b9e8e051cf6');
+module.exports = new Analysis(run_scheduler, '85936a30-714d-11e6-a783-f741503c7ff1');
 
