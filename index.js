@@ -9,6 +9,7 @@ const axios     = require('axios');
 const co        = require('co');
 const url_node  = require('url');
 
+
 function check_url(url) {
     if (url.indexOf('docs.google.com') === -1 && url.indexOf('spreadsheets') === -1) return url;
     const parse_url = url_node.parse(url);
@@ -29,7 +30,13 @@ function convert_to_json(data_csv) {
 
         converter.csv2json(data_csv, options, (err,result) => {
             if (err) return reject("Can't convert csv to json. Something ins't right");
-            resolve(result);
+            const object_return = {};
+
+            Object.keys(result).forEach((key) => {
+                object_return[key.toLowerCase()] = result[key];
+            });
+            
+            resolve(object_return);
         });
     });
 }
@@ -56,7 +63,6 @@ function transform_loc(location) {
  */
 function run_scheduler(context) {
     context.log("Running script");
-
     const env_var    = Utils.env_to_obj(context.environment);
     if (!env_var.url) return context.log("Missing url environment variable");
     if (!env_var.device_token) return context.log("Missing url environment variable");
@@ -65,7 +71,7 @@ function run_scheduler(context) {
 
     co(function* () {
         const url     = check_url(env_var.url);
-        const request = yield axios.get(url);
+        const request = yield axios.get(url).catch(console.log);
         if (!request.data && typeof request.data !== "string") return context.log("Can't access the URL");
 
         const data_list = yield convert_to_json(request.data);
@@ -91,9 +97,16 @@ function run_scheduler(context) {
         ["time","color","email_msg","email","reset_here"].forEach((x) => delete data[x]);
 
         function format_var(variable, value) {
+            let final_value;
+            try {
+                final_value = Number(value) || value;
+            } catch(e) {
+                final_value = value;
+            }
+            
             let data_to_insert = {
                 "variable": variable,
-                "value":value, 
+                "value": final_value, 
                 "serie":serie
             };
 
@@ -127,5 +140,5 @@ function run_scheduler(context) {
 
 }
 
-module.exports = new Analysis(run_scheduler, '933386e0-6660-11e6-b31b-3b9e8e051cf6');
+module.exports = new Analysis(run_scheduler, 'c685b3c0-d9c3-11e6-b110-c75bdbcc1b6d');
 

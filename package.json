@@ -13,10 +13,10 @@
   "author": "Tago LLC",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.13.1",
+    "axios": "^0.15.3",
     "co": "^4.6.0",
-    "json-2-csv": "^2.0.22",
-    "lodash": "^4.16.1",
-    "tago": "^3.1.0"
+    "json-2-csv": "^2.1.0",
+    "lodash": "^4.17.4",
+    "tago": "^3.4.7"
   }
 }

@@ -125,6 +125,7 @@ function run_scheduler(context) {
         data_to_insert.push({
             "variable": "stepnow",
             "value": String(new_stepnow),
+            "metadata": !color ? undefined : { color },
             serie
         });
         console.log(new_stepnow);
