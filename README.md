@@ -1,4 +1,4 @@
-## What this does
+## What this script does
 Bring a live demo for your customers and team using Tago instead of showing a Powerpoint file! This application creates data in your Tago account to simulate a device using the content created in a Google Spreadsheet. Tago will transfer the data from each row of your spreadsheet one-by-one to help you to share how your connect product will look like even before you add real hardware (sensors) on it. The speed of the simulation will depend on the Time Interval that you define to run the script (with a minimum interval of 30 seconds). It is an automated way to simulate a real device.
 
 ## How to run the script
