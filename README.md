@@ -3,7 +3,7 @@ Bring a live demo for your customers and team using Tago instead of showing a Po
 
 ## How to run the script
 * Create a Google Spreadsheet by following this template: [Training Spreadsheet](https://docs.google.com/spreadsheets/d/1MF5xih03tlFQzZD7fBbFS8miLiOK-d-5o_8PqT3oEH8/edit?usp=sharing).<br>
-* The variables to be inserted should be located in the first row of the spreadsheet. Their values should be included below in the column. The variable names should not contain **comma** or **spaces**; also de values should not contain **comma**;<br>
+* The variables to be inserted should be located in the first row of the spreadsheet. Values should be included in the cells below in the same column. The variable names should not contain **comma** or **spaces**; also the values should not contain **comma**;<br>
 * Make sure that your spreadsheet is set for Public Visualization so that Tago is able to access it.
 * Create a new Analysis in the admin website.<br>
 * Upload the file `scheduler.js.tago.js` into the analysis that your just created.<br>
