@@ -97,7 +97,11 @@
 					resolve(location);
 				});
 			}
-
+			function checkIsNumber(value) {
+    			let number = Number(value);
+    			if (Number.isNaN(number)) return value;
+    			else  return value = number;
+			}
 			/**
 			 * Create a scheduler based in a URL from GoogleDrive or another source.
 			 * Reserverd variables: email, email_msg, color, location, reset_here and time.
@@ -140,10 +144,7 @@
 					["time", "color", "email_msg", "email", "reset_here"].forEach(x => delete data[x]);
 
 					function format_var(variable, value) {
-						const convert_value = Number.isNaN(value);
-						if (!convert_value) {
-							value = parseFloat(value);
-						}
+					value = checkIsNumber(value);
 					let data_to_insert = {
 							"variable": variable,
 							"value": value,
