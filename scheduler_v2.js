@@ -75,13 +75,13 @@ function setMetadataToOneVariable(obj, serie) {
                         metadata: {}
                     };
                     if (serie) obj_var.serie = serie;
-                    if (keys[index]) obj_var.variable = keys[index];
-                    if (obj[keys[index]].label) obj_var.value = obj[keys[index]].label;
-                    if (obj[keys[index]].intensity) obj_var.value = obj[keys[index]].intensity;
-                    if (obj[keys[index]].x) obj_var.metadata.x = obj[keys[index]].x;
-                    if (obj[keys[index]].y) obj_var.metadata.y = obj[keys[index]].y;
-                    if (obj[keys[index]].color) obj_var.metadata.color = obj[keys[index]].color;
-                    if (obj[keys[index]].icon) obj_var.metadata.icon = obj[keys[index]].icon;
+                    if (keys[index]) obj_var.variable = String(keys[index]);
+                    if (obj[keys[index]].label) obj_var.value = String(obj[keys[index]].label);
+                    if (obj[keys[index]].intensity) obj_var.value = Number(obj[keys[index]].intensity);
+                    if (obj[keys[index]].x) obj_var.metadata.x = Number(obj[keys[index]].x);
+                    if (obj[keys[index]].y) obj_var.metadata.y = Number(obj[keys[index]].y);
+                    if (obj[keys[index]].color) obj_var.metadata.color = String(obj[keys[index]].color);
+                    if (obj[keys[index]].icon) obj_var.metadata.icon = String(obj[keys[index]].icon);
                     variables.push(obj_var);
                     // a[index] = key;
                     // obj[a[index]] = value;
