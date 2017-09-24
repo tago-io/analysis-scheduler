@@ -1,5 +1,3 @@
-'use strict';
-
 const Analysis = require('tago/analysis');
 const Utils = require('tago/utils');
 const Service = require('tago/services');
@@ -52,20 +50,54 @@ function transform_loc(location) {
 function transform_metadata(metadata) {
     return new Promise((resolve, reject) => {
         if (!metadata || metadata === '') return resolve(null);
-
-        metadata = metadata.split(";");
-        if (metadata.length < 1) return reject("Invalid metadata");
         try {
-            metadata = { 'x': Number(metadata[0]), 'y': Number(metadata[1]), 'color': metadata[2], 'icon': metadata[3], 'label': metadata[4] };
+            const metadata_obj = {};
+            if (metadata.x) metadata_obj.x = Number(metadata.x);
+            if (metadata.y) metadata_obj.y = Number(metadata.y);
+            if (metadata.color) metadata_obj.color = String(metadata.color);
+            if (metadata.icon) metadata_obj.icon = String(metadata.icon);
+            resolve(metadata_obj);
         } catch (error) {
             return reject(error);
         }
-        resolve(metadata);
     });
 }
+
+function setMetadataToOneVariable(obj, serie) {
+    return new Promise((resolve, reject) => {
+        if (!obj || obj === '') return resolve(null);
+        const variables = [];
+        try {
+            const keys = Object.keys(obj);
+            [obj].map((x) => {
+                keys.map((f, index) => {
+                    const obj_var = {
+                        metadata: {}
+                    };
+                    if (serie) obj_var.serie = serie;
+                    if (keys[index]) obj_var.variable = keys[index];
+                    if (obj[keys[index]].label) obj_var.value = obj[keys[index]].label;
+                    if (obj[keys[index]].intensity) obj_var.value = obj[keys[index]].intensity;
+                    if (obj[keys[index]].x) obj_var.metadata.x = obj[keys[index]].x;
+                    if (obj[keys[index]].y) obj_var.metadata.y = obj[keys[index]].y;
+                    if (obj[keys[index]].color) obj_var.metadata.color = obj[keys[index]].color;
+                    if (obj[keys[index]].icon) obj_var.metadata.icon = obj[keys[index]].icon;
+                    variables.push(obj_var);
+                    // a[index] = key;
+                    // obj[a[index]] = value;
+                });
+            });
+        } catch (error) {
+            return reject(error);
+        }
+        resolve(variables);
+    });
+}
+
 function checkIsNumber(value) {
     let number = Number(value);
-    if (Number.isNaN(number)) return value; else return value = number;
+    if (Number.isNaN(number)) return value;
+    else return value = number;
 }
 /**
  * Create a scheduler based in a URL from GoogleDrive or another source.
@@ -96,6 +128,7 @@ function run_scheduler(context) {
         const serie = new Date().getTime();
         const location = yield transform_loc(data.location);
         const metadata = yield transform_metadata(data.metadata);
+        const metadata_to_one_var = yield setMetadataToOneVariable(data.variable.metadata, serie)
         const color = data.color;
         const reset = data.reset_here;
         let time;
@@ -119,18 +152,15 @@ function run_scheduler(context) {
 
             if (time) data_to_insert.time = time;
             if (location) data_to_insert.location = location;
-            if (metadata.x || metadata.y || metadata.color || metadata.icon || metadata.label) data_to_insert.metadata = metadata;
-
+            if (metadata) data_to_insert.metadata = metadata;
             return data_to_insert;
         }
-
-        const data_to_insert = [];
-        const data_filtred = [];
+        let data_to_insert = [];
         Object.keys(data).forEach(key => {
-            data_to_insert.push(format_var(key, data[key]));
+            if (data[key] && key !== 'metadata') data_to_insert.push(format_var(key, data[key]));
         });
 
-        data_filtred.push({
+        data_to_insert.push({
             "variable": "stepnow",
             "value": data_list[stepnow + 1] ? stepnow + 1 : 0,
             serie
@@ -141,16 +171,10 @@ function run_scheduler(context) {
             const result = yield Promise.all(remove_all);
             context.log("Data Removed", result);
         }
-        data_to_insert.map((element, index) => {
-            if (element.value === 'x') {
-                delete element.value;
-                data_filtred.push(element);
-            }
-        });
-
-        yield mydevice.insert(data_filtred);
+        data_to_insert = data_to_insert.concat(metadata_to_one_var);
+        yield mydevice.insert(data_to_insert);
         context.log("Succesfully Inserted schedule data");
     }).catch(context.log);
 }
 
-module.exports = new Analysis(run_scheduler, 'a1233b4b-168b-41d1-ae9d-b4faa0cee8b8');
+module.exports = new Analysis(run_scheduler, '8b3922c0-c799-11e6-824d-3fae90187e42');

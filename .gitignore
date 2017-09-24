@@ -36,3 +36,9 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+scheduler_for_read_csv.js
+scheduler_layer_map.js
+scheduler_layer_vars.js
+scheduler_metadata.js.tago.js
+test.js
