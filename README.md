@@ -4,8 +4,8 @@ Bring a live demo for your customers and team using Tago instead of showing a Po
 ## How to run the script
 * Create a Google Spreadsheet by following this template: [Training Spreadsheet](https://docs.google.com/spreadsheets/d/1MF5xih03tlFQzZD7fBbFS8miLiOK-d-5o_8PqT3oEH8/edit?usp=sharing).<br>
 * The variables to be inserted should be located in the first row of the spreadsheet. Values should be included in the cells below in the same column. The variable names should not contain **comma** or **spaces**; also the values should not contain **comma**;<br>
-* Make sure that your spreadsheet is set for Public Visualization so that Tago is able to access it.
-* Create a new Analysis in the admin website.<br>
+* Make sure that your spreadsheet is set for Public Visualization so that Tago is able to access it. To do this, click in **Share** > **Advanced** > **Change (Anyone who has the link can view)** > Select **ON - Anyone with the link** > **Can view or Can Edit**.
+* Create a new Analysis in the Tago admin website.<br>
 * Upload the file `scheduler.js.tago.js` into the analysis that your just created.<br>
 * Click on the tab **Environment Variables** and **New**. Type "*url*" on the variable key entry, and copy the URL from your Google Spreadsheet onto the "*value*' entry.<br>
 * Create a new device, and get a token from the device that will receive the simulated data.<br>
@@ -14,7 +14,7 @@ Bring a live demo for your customers and team using Tago instead of showing a Po
 * Click on **Save**.<br>
 
 ## Check if it is Running
-* Go to the Analysis, in the admin, and select your analysis.<br>
+* Go to the Analysis, in the Tago admin, and select your analysis.<br>
 * Click on the tab **Console**.<br>
 * Click on **Run Script**.<br>
 * Check the Console to see if there is any error or if it is running successful.<br>
