@@ -7,10 +7,10 @@ Bring a live demo for your customers and team using Tago instead of showing a Po
 * Make sure that your spreadsheet is set for Public Visualization so that Tago is able to access it. To do this, click in **Share** > **Advanced** > **Change (Anyone who has the link can view)** > Select **ON - Anyone with the link** > **Can view or Can Edit**.<br>
 
 * Create a new Analysis in the Tago admin website, click on the tab **Examples** and take download of the Scheduler. <br>
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Analysis examples")
+![alt text](https://github.com/tago-io/analysis-scheduler/blob/master/_static/analysis_examples.png?raw=true "Analysis examples")<br>
 
 * Go back to the "General information" tab and configure your analysis. <br>
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Analysis settings")
+![alt text](https://github.com/tago-io/analysis-scheduler/blob/master/_static/conf_analysis.png?raw=true "Analysis settings")
  1. Put a name for your analysis;
  2. Put 'Timer disabled' here until it verifies that everything is working, after that you can put a desired time to run your simulation;
  3. Let's run in **Tago**; 
@@ -28,7 +28,7 @@ Bring a live demo for your customers and team using Tago instead of showing a Po
 3. Click on **Save** button.
 
 * I'ts variables should be according to the image: <br> 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Analysis environment variables")
+![alt text](https://github.com/tago-io/analysis-scheduler/blob/master/_static/env_vars.png?raw=true "Analysis environment variables")
 
 ## Check if it is Running
 * Go to the Analysis, in the Tago admin, and select your analysis.<br>
