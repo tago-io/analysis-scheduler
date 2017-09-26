@@ -4,20 +4,38 @@ Bring a live demo for your customers and team using Tago instead of showing a Po
 ## How to run the script
 * Create a Google Spreadsheet by following this template: [Training Spreadsheet](https://docs.google.com/spreadsheets/d/1MF5xih03tlFQzZD7fBbFS8miLiOK-d-5o_8PqT3oEH8/edit?usp=sharing).<br>
 * The variables to be inserted should be located in the first row of the spreadsheet. Values should be included in the cells below in the same column. The variable names should not contain **comma** or **spaces**; also the values should not contain **comma**;<br>
-* Make sure that your spreadsheet is set for Public Visualization so that Tago is able to access it. To do this, click in **Share** > **Advanced** > **Change (Anyone who has the link can view)** > Select **ON - Anyone with the link** > **Can view or Can Edit**.
-* Create a new Analysis in the Tago admin website.<br>
-* Upload the file `scheduler.js.tago.js` into the analysis that your just created.<br>
-* Click on the tab **Environment Variables** and **New**. Type "*url*" on the variable key entry, and copy the URL from your Google Spreadsheet onto the "*value*' entry.<br>
-* Create a new device, and get a token from the device that will receive the simulated data.<br>
-* Click on **Environment Variables** and **New**. Input "*device_token*" on name entry, and the token on "*value*' entry.<br>
-* Back to the **General Information** tab, select the **Time Interval to run this script** to define how often each row of your spreadsheet will be input to your device. Every row in the spreadsheet will be written in the device using that time interval. The system will start over to the first row when it get to the bottom of your spreadsheet that contains data<br>
-* Click on **Save**.<br>
+* Make sure that your spreadsheet is set for Public Visualization so that Tago is able to access it. To do this, click in **Share** > **Advanced** > **Change (Anyone who has the link can view)** > Select **ON - Anyone with the link** > **Can view or Can Edit**.<br>
+
+* Create a new Analysis in the Tago admin website, click on the tab **Examples** and take download of the Scheduler. <br>
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Analysis examples")
+
+* Go back to the "General information" tab and configure your analysis. <br>
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Analysis settings")
+ 1. Put a name for your analysis;
+ 2. Put 'Timer disabled' here until it verifies that everything is working, after that you can put a desired time to run your simulation;
+ 3. Let's run in **Tago**; 
+ 4. Upload the file `scheduler.js.tago.js` file you downloaded in the examples tab;
+ 5. Script language used for this script, select **Node**;
+ 6. Click on **Save** button. <br>
+
+* Create a new device: **Device** > **+** > **Put the name for your device** > **Save**. <br>
+* Get a token from the device that will receive the simulated data. **Select the device you just created** > **Tokens** > **Copy a token**. <br>
+
+* Go back to analysis you just created. <br>
+* Click on the tab **Environment Variables** and create new variables: <br>
+1. Put the "*key*" with the name **device_token** and at "*value*" paste the **token of your device**;
+2. Put the "*key*" "url" with the name **url**, and at "*value*" paste the **URL from your Google Spreadsheet**; <br>
+3. Click on **Save** button.
+
+* I'ts variables should be according to the image: <br> 
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Analysis environment variables")
 
 ## Check if it is Running
 * Go to the Analysis, in the Tago admin, and select your analysis.<br>
 * Click on the tab **Console**.<br>
 * Click on **Run Script**.<br>
 * Check the Console to see if there is any error or if it is running successful.<br>
+* If everything is normal, go to **Time interval to run this script** and put to run in the time that you want.<br>
 
 ## Google Spreadsheet and private properties
 You can input some reserved variables in your spreadsheet, that will not be write into your bucket. These variables can trigger special conditions when the script get's to that line, such as to send email or add color propertie to the variables written at that moment.
