@@ -78,11 +78,11 @@ function run_scheduler(context) {
         let stepnow = yield mydevice.find({ "variable": "stepnow", "query": "last_value" });
         stepnow = stepnow[0] ? stepnow[0].value : 0;
 
-        const data = data_list[stepnow] ? data_list[stepnow] : data_list[0];
-        const serie = data.serie || new Date().getTime();
+        const data     = data_list[stepnow] ? data_list[stepnow] : data_list[0];
+        const serie    = data.serie || new Date().getTime();
         const location = yield transform_loc(data.location);
-
         const metadata = data.metadata;
+        const unit     = data.unit;
         if (metadata) {
             Object.keys(metadata).forEach((n) => {
                 metadata[n] = checkIsNumber(metadata[n]);
@@ -99,7 +99,6 @@ function run_scheduler(context) {
 
         if (data.email_msg && data.email_msg !== '' && data.email) send_email();
         ["time", "metadata", "email_msg", "email", "reset_here"].forEach(x => delete data[x]);
-
         let time;
         function format_var(variable, value) {
             value = checkIsNumber(value);
@@ -108,7 +107,6 @@ function run_scheduler(context) {
                 "value": value,
                 "serie": serie
             };
-
             if (time) data_to_insert.time = time;
             if (location) data_to_insert.location = location;
             if (metadata) data_to_insert.metadata = metadata;
@@ -123,7 +121,7 @@ function run_scheduler(context) {
         }
         let data_to_insert = [];
         Object.keys(data).forEach(key => {
-            if (data[key] && !key.includes('_object')) data_to_insert.push(format_var(key, data[key]));
+            if (!key.includes('_object') && !key.includes('unit')) data_to_insert.push(format_var(key, data[key]));
         });
 
         data_to_insert.push({
@@ -137,8 +135,16 @@ function run_scheduler(context) {
             const result = yield Promise.all(remove_all);
             context.log("Data Removed", result);
         }
+        if (unit) {
+            data_to_insert.map((element) => {
+                Object.keys(unit).map((key) => {
+                    if (element.variable === key) element.unit = unit[key];
+                });
+            });
+        }
+
         yield mydevice.insert(data_to_insert);
         context.log("Succesfully Inserted schedule data");
     }).catch(context.log);
 }
-module.exports = new Analysis(run_scheduler, '9ba394af-121b-4214-83f9-ffcc1aa87a5d');
+module.exports = new Analysis(run_scheduler, '8b3922c0-c799-11e6-824d-3fae90187e42');
