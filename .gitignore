@@ -25,7 +25,7 @@ coverage
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/
-*.js.tago.js
+# *.js.tago.js
 
 # Dependency directories
 node_modules
@@ -41,4 +41,5 @@ scheduler_for_read_csv.js
 scheduler_layer_map.js
 scheduler_layer_vars.js
 scheduler_metadata.js.tago.js
+layer.js.tago.js
 test.js
