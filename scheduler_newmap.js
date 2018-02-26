@@ -56,24 +56,24 @@ function checkIsNumber(value) {
 /**
  * Create a scheduler based in a URL from GoogleDrive or another source.
  * Reserverd variables: email, email_msg, color, location, reset_here and time.
- * @param  {object} console - from tago
+ * @param  {object} context - from tago
  */
-function run_scheduler() {
-    console.log("Running script");
+function run_scheduler(context) {
+    context.log("Running script");
 
-    //const env_var = Utils.env_to_obj(console.environment);
-    //if (!env_var.url) return console.log("Missing url environment variable");
-    //if (!env_var.device_token) return console.log("Missing url environment variable");
+    const env_var = Utils.env_to_obj(context.environment);
+    if (!env_var.url) return context.log("Missing url environment variable");
+    if (!env_var.device_token) return context.log("Missing url environment variable");
 
-    const mydevice = new Device('e0c16f6f-bfcd-449c-92f7-8463445edda7');
+    const mydevice = new Device(env_var.device_token);
 
     co(function* () {
-        const url = check_url('https://docs.google.com/spreadsheets/d/1fiaPSxwuK21uKsXF9fdq14fspid_ZrM9HFg1ivjeieY/edit#gid=0');
+        const url = check_url(env_var.url);
         const request = yield axios.get(url);
-        if (!request.data && typeof request.data !== "string") return console.log("Can't access the URL");
+        if (!request.data && typeof request.data !== "string") return context.log("Can't access the URL");
 
         const data_list = yield convert_to_json(request.data);
-        if (!data_list || !data_list[0]) return console.log("Tago can't get the excel archive by the URL. Something wrong happens");
+        if (!data_list || !data_list[0]) return context.log("Tago can't get the excel archive by the URL. Something wrong happens");
 
         let stepnow = yield mydevice.find({ "variable": "stepnow", "query": "last_value" });
         stepnow = stepnow[0] ? stepnow[0].value : 0;
@@ -92,8 +92,8 @@ function run_scheduler() {
         const reset = data.reset_here;
         //default -  disable  | igual generate token
         function send_email() {
-            console.log('Sending email...');
-            const email_service = new Service(console.token).email;
+            context.log('Sending email...');
+            const email_service = new Service(context.token).email;
             email_service.send(data.email, 'Tago Scheduler', data.email_msg);
         }
 
@@ -109,11 +109,21 @@ function run_scheduler() {
             };
             if (time) data_to_insert.time = time;
             if (location) data_to_insert.location = location;
-            if (metadata) data_to_insert.metadata = metadata;
+            if (metadata) {
+                const is_prop = metadata.hasOwnProperty('img_pin');
+                if (is_prop && metadata.img_pin.includes(';')) {
+                    const img_splited = metadata.img_pin.split(';');
+                    metadata.img_pin = img_splited;
+                } else data_to_insert.metadata = metadata;
+            }
             const unique_metadata = data[`${variable}_object`] ? data[`${variable}_object`].metadata : null;
             if (unique_metadata) {
                 Object.keys(unique_metadata).forEach((n) => {
-                    unique_metadata[n] = checkIsNumber(unique_metadata[n]);
+                    const is_prop = unique_metadata.hasOwnProperty('img_pin');
+                if (is_prop && unique_metadata[n].includes(';')) {
+                    const img_splited = unique_metadata[n].split(';');
+                    unique_metadata[n] = img_splited;
+                } else unique_metadata[n] = checkIsNumber(unique_metadata[n]);
                 });
                 data_to_insert.metadata = Object.assign({}, data_to_insert.metadata || {}, unique_metadata);
             }
@@ -133,7 +143,7 @@ function run_scheduler() {
         if (reset) {
             const remove_all = data_to_insert.map(x => mydevice.remove(x.variable, 'all'));
             const result = yield Promise.all(remove_all);
-            console.log("Data Removed", result);
+            context.log("Data Removed", result);
         }
         if (unit) {
             data_to_insert.map((element) => {
@@ -142,16 +152,9 @@ function run_scheduler() {
                 });
             });
         }
-        yield mydevice.remove('product_1', 10).then(console.log);
-        yield mydevice.remove('product_4', 10).then(console.log);
-        const filtred_data = [];
-        data_to_insert.forEach((x) => {
-            if(x.value !== '###') filtred_data.push(x);
-        });
-        yield mydevice.insert(filtred_data);
-        console.log("Succesfully Inserted schedule data");
-    }).catch(console.log);
+        
+        yield mydevice.insert(data_to_insert);
+        context.log("Succesfully Inserted schedule data");
+    }).catch(context.log);
 }
-run_scheduler();
-//setInterval(run_scheduler, 5000);
-//module.exports = new Analysis(run_scheduler, '8b3922c0-c799-11e6-824d-3fae90187e42');
+module.exports = new Analysis(run_scheduler, 'a1233b4b-168b-41d1-ae9d-b4faa0cee8b8');
